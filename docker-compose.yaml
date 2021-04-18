@@ -1,0 +1,30 @@
+version: '2'
+
+networks:
+  test:
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - test
+  kafka:
+    image: wurstmeister/kafka:2.13-2.6.0 #wurstmeister가 가장 인기가 많음. 아직 kafka 공식 docker가 없음
+    container_name: kafka
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - test
